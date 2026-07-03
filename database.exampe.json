@@ -34,44 +34,9 @@
       "features": "Растение является мощным природным фильтром и эффективно очищает воздух в помещении от вредных примесей и газов."
     }
   ],
-  "users": [
-    {
-      "id": 1783093097249,
-      "username": "Faiz",
-      "password": "140807"
-    }
-  ],
-  "collections": {
-    "Faiz": [
-      {
-        "instanceId": 1783093739178,
-        "catalogId": 1,
-        "name": "Монстера",
-        "addedDate": "03.07.2026",
-        "notes": "",
-        "waterIntervalMinutes": 10080,
-        "repotIntervalMinutes": 43200,
-        "lastWatered": "2026-07-03T15:48:59.178Z",
-        "lastRepotted": "2026-07-03T15:48:59.178Z"
-      },
-      {
-        "instanceId": 1783096049751,
-        "catalogId": 1,
-        "name": "Монстера",
-        "addedDate": "03.07.2026",
-        "notes": "",
-        "waterIntervalMinutes": 1,
-        "repotIntervalMinutes": 1,
-        "lastWatered": "2026-07-03T16:27:29.769Z",
-        "lastRepotted": "2026-07-03T16:27:29.769Z"
-      }
-    ]
-  },
+  "users": [],
+  "collections": {},
   "tradeOffers": [],
   "chats": {},
-  "favorites": {
-    "Faiz": [
-      1
-    ]
-  }
+  "favorites": {}
 }

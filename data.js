@@ -1,38 +1,75 @@
-export const plantCatalog = [
-    {
-        id: 1,
-        name: "Монстера",
-        img: "data:image/svg+xml;utf8,<svg xmlns='http://w3.org' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23e6f4ea'/><path d='M50 85 V30 M50 40 Q75 30 70 50 Q50 55 50 40 M50 50 Q25 40 30 60 Q50 65 50 50 M50 60 Q80 55 75 75 Q50 75 50 60 M50 65 Q20 60 25 80 Q50 80 50 65' stroke='%2310b981' stroke-width='4' fill='none' stroke-linecap='round'/></svg>",
-        watering: "Обильный полив теплой отстоянной водой после того, как верхний слой почвы просохнет примерно на 2-3 см. В среднем процедуру проводят раз в 7 дней.",
-        lighting: "Предпочитает яркий, но обязательно рассеянный свет. Может расти в легкой полутени. Важно избегать прямых солнечных лучей во избежание ожогов.",
-        repotting: "Молодые активные кусты требуют пересадки ежегодно в весенний период. Взрослые крупные экземпляры пересаживают раз в 2-3 года.",
-        toxicity: "Ядовито. Сок растения содержит раздражающие вещества, опасные для кошек и собак.",
-        isToxic: true,
-        features: "Широкие резные листья нужно регулярно протирать влажной мягкой тканью от пыли и опрыскивать водой комнатной температуры."
-    },
-    {
-        id: 2,
-        name: "Сансевиерия",
-        img: "data:image/svg+xml;utf8,<svg xmlns='http://w3.org' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23f0fdf4'/><path d='M35 85 Q30 50 40 20 Q50 50 45 85 M50 85 Q45 40 52 15 Q60 40 55 85 M65 85 Q60 55 65 30 Q75 55 70 85' fill='%23059669' stroke='%23047857' stroke-width='1.5'/></svg>",
-        watering: "Очень редкий и скудный полив. Летом достаточно увлажнять почву раз в 2-3 недели. Зимой полив сокращают до одного раза в месяц.",
-        lighting: "Крайне неприхотлива. Одинаково хорошо переносит как яркое солнце, так и глубокую тень в глубине жилой комнаты.",
-        repotting: "Редкая пересадка. Процедуру проводят только тогда, когда мощные корни полностью заполнят весь объем горшка (обычно раз в 3-4 года).",
-        toxicity: "Слабо ядовито. При случайном поедании листьев животными может вызвать легкое расстройство пищеварения.",
-        isToxic: true,
-        features: "Главное правило — избегать избытка влаги и застоя воды внутри листовой розетки, иначе цветок быстро начнет гнить."
-    },
-    {
-        id: 3,
-        name: "Хлорофитум",
-        img: "data:image/svg+xml;utf8,<svg xmlns='http://w3.org' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23ecfdf5'/><path d='M50 85 Q20 60 15 40 Q40 55 50 85 M50 85 Q80 60 85 40 Q60 55 50 85 M50 85 Q30 45 35 25 Q45 45 50 85 M50 85 Q70 45 65 25 Q55 45 50 85' fill='none' stroke='%2310b981' stroke-width='3' stroke-linecap='round'/></svg>",
-        watering: "Умеренное и регулярное увлажнение. В летний период поливают 2 раза в неделю, в зимние месяцы частоту снижают до 1 раза в неделю.",
-        lighting: "Идеально подходит яркий рассеянный свет или мягкая полутень. При хорошем освещении листья становятся ярче.",
-        repotting: "Требуется ежегодная пересадка весной, так как развитая корневая система разрастается очень стремительно.",
-        toxicity: "Полностью безопасно для людей, маленьких детей и домашних питомцев.",
-        isToxic: false,
-        features: "Растение является мощным природным фильтром и эффективно очищает воздух в помещении от вредных примесей и газов."
+export let plantCatalog = [];
+export let userCollection = [];
+export let userFavorites = [];
+
+export async function loadPlantData() {
+    try {
+        const response = await fetch('/api/database');
+        if (!response.ok) throw new Error();
+        const data = await response.json();
+        plantCatalog = data.catalog || [];
+        return plantCatalog;
+    } catch (error) {
+        return [];
     }
-];
+}
+
+export async function syncUserDataFromServer() {
+    const username = localStorage.getItem('current_user');
+    if (!username) return;
+
+    try {
+        const response = await fetch(`/api/user/data?username=${encodeURIComponent(username)}`);
+        if (response.ok) {
+            const data = await response.json();
+            userCollection = data.collection || [];
+            userFavorites = data.favorites || [];
+        }
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+export async function saveCollectionToServer() {
+    const username = localStorage.getItem('current_user');
+    if (!username) return;
+
+    try {
+        await fetch('/api/user/collection', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, collection: userCollection })
+        });
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+export async function saveFavoritesToServer() {
+    const username = localStorage.getItem('current_user');
+    if (!username) return;
+
+    try {
+        await fetch('/api/user/favorites', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, favorites: userFavorites })
+        });
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+export function setLocalCollection(newCol) {
+    userCollection = newCol;
+}
+
+export function setLocalFavorites(newFav) {
+    userFavorites = newFav;
+}
+
+
+
 
 
 

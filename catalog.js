@@ -1,4 +1,4 @@
-import { plantCatalog } from './data.js';
+import { plantCatalog, userFavorites } from './data.js';
 import { toggleFavorite } from './favorites.js';
 import { openAddToCollectionForm } from './collection.js';
 
@@ -6,18 +6,19 @@ export function renderCatalog() {
     const container = document.getElementById('catalog-list');
     if (!container) return;
     container.innerHTML = '';
+    
+    // Передаем актуальные массивы, которые к этому моменту уже скачались
     renderPlantGrid(plantCatalog, container, true);
 }
 
 export function renderPlantGrid(list, container, showAddBtn) {
-    const favorites = JSON.parse(localStorage.getItem('plant_favorites')) || [];
-    
     list.forEach(function(plant) {
         const cardContainer = document.createElement('div');
         cardContainer.className = 'card-container';
         cardContainer.setAttribute('id', 'catalog-card-' + plant.id);
         
-        let isFav = favorites.includes(plant.id);
+        // Проверяем сердечко напрямую из актуального массива, скачанного с сервера
+        let isFav = userFavorites.includes(plant.id);
         let heartIcon = isFav ? '❤️' : '🤍';
         let badgeClass = plant.isToxic ? 'danger' : 'safe';
         let badgeText = plant.isToxic ? 'Ядовито' : 'Безопасно';
@@ -46,7 +47,7 @@ export function renderPlantGrid(list, container, showAddBtn) {
         
         cardContainer.addEventListener('click', function(e) {
             if (e.target.classList.contains('fav-btn')) {
-                toggleFavorite(event, parseInt(e.target.getAttribute('data-id')));
+                toggleFavorite(e, parseInt(e.target.getAttribute('data-id')));
             } else if (e.target.classList.contains('btn-add')) {
                 openAddToCollectionForm(plant.id);
             } else {
@@ -67,6 +68,9 @@ export function showCatalogCard(catalogId) {
         }
     }, 100);
 }
+
+
+
 
 
 

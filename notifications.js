@@ -1,3 +1,4 @@
+import { userCollection } from './data.js';
 import { getTimeLeft, sendSystemNotification } from './utils.js';
 
 export function checkNotifications() {
@@ -6,13 +7,12 @@ export function checkNotifications() {
     if (!panel || !list) return;
     list.innerHTML = '';
     
-    let myCollection = JSON.parse(localStorage.getItem('my_plant_collection')) || [];
     let notifiedWater = JSON.parse(localStorage.getItem('notified_water')) || {};
     let notifiedRepot = JSON.parse(localStorage.getItem('notified_repot')) || {};
     
     let activeAlerts = 0;
 
-    myCollection.forEach(function(plant) {
+    userCollection.forEach(function(plant) {
         const waterStatus = getTimeLeft(plant.lastWatered, plant.waterIntervalMinutes, "");
         const repotStatus = getTimeLeft(plant.lastRepotted, plant.repotIntervalMinutes, "");
 
@@ -45,6 +45,7 @@ export function checkNotifications() {
     localStorage.setItem('notified_repot', JSON.stringify(notifiedRepot));
     panel.style.display = activeAlerts > 0 ? 'block' : 'none';
 }
+
 
 
 

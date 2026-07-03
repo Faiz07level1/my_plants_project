@@ -1,4 +1,4 @@
-import { plantCatalog } from './data.js'; 
+import { plantCatalog, userCollection, setLocalCollection, saveCollectionToServer } from './data.js';
 import { getTimeLeft } from './utils.js';
 import { showCatalogCard } from './catalog.js';
 import { checkNotifications } from './notifications.js';
@@ -21,7 +21,7 @@ export function openAddToCollectionForm(plantId) {
     window.switchPage('add-to-collection-page');
 }
 
-export function saveToCollection(event) {
+export async function saveToCollection(event) {
     event.preventDefault();
     const plantId = parseInt(document.getElementById('form-plant-id').value);
     const plantData = plantCatalog.find(function(p) { return p.id === plantId; });
@@ -36,8 +36,6 @@ export function saveToCollection(event) {
     const rm = parseInt(document.getElementById('form-plant-repot-mins').value) || 0;
     const repotMinutes = (rd * 24 * 60) + (rh * 60) + rm;
 
-    let myCollection = JSON.parse(localStorage.getItem('my_plant_collection')) || [];
-
     const userPlant = {
         instanceId: Date.now(),
         catalogId: plantId,
@@ -50,10 +48,11 @@ export function saveToCollection(event) {
         lastRepotted: new Date().toISOString()
     };
 
-    myCollection.push(userPlant);
-    localStorage.setItem('my_plant_collection', JSON.stringify(myCollection));
+    userCollection.push(userPlant);
+    await saveCollectionToServer();
+    
     window.switchPage('my-plants');
-    showToast('Добавлено в личную коллекцию!');
+    showToast("Добавлено в личную коллекцию!");
 }
 
 export function renderCollection() {
@@ -61,14 +60,12 @@ export function renderCollection() {
     if (!container) return;
     container.innerHTML = '';
 
-    let myCollection = JSON.parse(localStorage.getItem('my_plant_collection')) || [];
-
-    if (myCollection.length === 0) {
+    if (userCollection.length === 0) {
         container.innerHTML = '<p>Ваша коллекция пуста.</p>';
         return;
     }
 
-    myCollection.forEach(function(plant) {
+    userCollection.forEach(function(plant) {
         const card = document.createElement('div');
         card.className = 'my-plant-card';
         card.setAttribute('data-instance-id', plant.instanceId);
@@ -100,14 +97,12 @@ export function renderCollection() {
 }
 
 export function updateTimers() {
-    let myCollection = JSON.parse(localStorage.getItem('my_plant_collection')) || [];
-    
-    myCollection.forEach(function(plant) {
+    userCollection.forEach(function(plant) {
         const card = document.querySelector('[data-instance-id="' + plant.instanceId + '"]');
         if (!card) return;
 
-        const waterStatus = getTimeLeft(plant.lastWatered, plant.waterIntervalMinutes, "Trebuetsya poliv!");
-        const repotStatus = getTimeLeft(plant.lastRepotted, plant.repotIntervalMinutes, "Trebuetsya peresadka!");
+        const waterStatus = getTimeLeft(plant.lastWatered, plant.waterIntervalMinutes, "Требуется полив! 💧");
+        const repotStatus = getTimeLeft(plant.lastRepotted, plant.repotIntervalMinutes, "Требуется пересадка! 🪴");
 
         const waterSpan = card.querySelector('.timer-water');
         const repotSpan = card.querySelector('.timer-repot');
@@ -128,43 +123,45 @@ export function updateTimers() {
     });
 }
 
-function actionWater(instanceId) {
-    let myCollection = JSON.parse(localStorage.getItem('my_plant_collection')) || [];
-    const plant = myCollection.find(function(item) { return item.instanceId === instanceId; });
+async function actionWater(instanceId) {
+    const plant = userCollection.find(function(item) { return item.instanceId === instanceId; });
     if (plant) {
         plant.lastWatered = new Date().toISOString();
         let notifiedWater = JSON.parse(localStorage.getItem('notified_water')) || {};
         delete notifiedWater[instanceId];
         localStorage.setItem('notified_water', JSON.stringify(notifiedWater));
-        localStorage.setItem('my_plant_collection', JSON.stringify(myCollection));
+        
+        await saveCollectionToServer();
         renderCollection();
         checkNotifications();
         showToast("Полив отмечен!");
     }
 }
 
-function actionRepot(instanceId) {
-    let myCollection = JSON.parse(localStorage.getItem('my_plant_collection')) || [];
-    const plant = myCollection.find(function(item) { return item.instanceId === instanceId; });
+async function actionRepot(instanceId) {
+    const plant = userCollection.find(function(item) { return item.instanceId === instanceId; });
     if (plant) {
         plant.lastRepotted = new Date().toISOString();
         let notifiedRepot = JSON.parse(localStorage.getItem('notified_repot')) || {};
         delete notifiedRepot[instanceId];
         localStorage.setItem('notified_repot', JSON.stringify(notifiedRepot));
-        localStorage.setItem('my_plant_collection', JSON.stringify(myCollection));
+        
+        await saveCollectionToServer();
         renderCollection();
         checkNotifications();
         showToast("Пересадка отмечена!");
     }
 }
 
-function removeFromCollection(instanceId) {
-    let myCollection = JSON.parse(localStorage.getItem('my_plant_collection')) || [];
-    myCollection = myCollection.filter(function(item) { return item.instanceId !== instanceId; });
-    localStorage.setItem('my_plant_collection', JSON.stringify(myCollection));
+async function removeFromCollection(instanceId) {
+    const updated = userCollection.filter(function(item) { return item.instanceId !== instanceId; });
+    setLocalCollection(updated);
+    
+    await saveCollectionToServer();
     renderCollection();
     checkNotifications();
 }
+
 
 
 
