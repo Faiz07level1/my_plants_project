@@ -3,9 +3,22 @@ import { syncUserDataFromServer } from './data.js';
 
 export async function initAuth() {
     const currentUser = localStorage.getItem('current_user');
+    
     if (currentUser) {
         await syncUserDataFromServer();
         hideAuthModal();
+    } else {
+        const container = document.getElementById('auth-container');
+        if (container) {
+            try {
+                const response = await fetch('./auth.html');
+                if (response.ok) {
+                    container.innerHTML = await response.text();
+                }
+            } catch (error) {
+                console.error("Не удалось загрузить формы авторизации:", error);
+            }
+        }
     }
 }
 

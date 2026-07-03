@@ -6,6 +6,8 @@ import { renderCatalog, showCatalogCard } from './catalog.js';
 import { checkNotifications } from './notifications.js';
 import { requestNotificationPermission } from './utils.js';
 import { initAuth, toggleAuthForms, handleLogin, handleSignup } from './auth.js';
+import { openCreateOfferModal, closeCreateOfferModal, handleCreateOffer, handleTradePlantChange, cancelTradeOffer } from './trade.js';
+import { handleSendMessage, startChatWith, executeTrade } from './chats.js';
 
 window.switchPage = switchPage;
 window.toggleFavorite = toggleFavorite;
@@ -14,12 +16,19 @@ window.showCatalogCard = showCatalogCard;
 window.toggleAuthForms = toggleAuthForms;
 window.handleLogin = handleLogin;
 window.handleSignup = handleSignup;
+window.openCreateOfferModal = openCreateOfferModal;
+window.closeCreateOfferModal = closeCreateOfferModal;
+window.handleCreateOffer = handleCreateOffer;
+window.handleSendMessage = handleSendMessage;
+window.startChatWith = startChatWith;
+window.handleTradePlantChange = handleTradePlantChange;
+window.cancelTradeOffer = cancelTradeOffer;
+window.executeTrade = executeTrade;
 
 async function startApplication() {
-    await initAuth();     
-    await loadPlantData(); 
-    
-    renderCatalog();     
+    await initAuth();
+    await loadPlantData();
+    renderCatalog();
     requestNotificationPermission();
 
     setInterval(function() {
@@ -30,9 +39,13 @@ async function startApplication() {
     }, 1000);
 }
 
-
-
 startApplication();
+
+
+
+
+
+
 
 
 

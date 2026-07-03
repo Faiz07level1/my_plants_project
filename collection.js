@@ -1,5 +1,5 @@
 import { plantCatalog, userCollection, setLocalCollection, saveCollectionToServer } from './data.js';
-import { getTimeLeft } from './utils.js';
+import { getTimeLeft, showToast } from './utils.js'; 
 import { showCatalogCard } from './catalog.js';
 import { checkNotifications } from './notifications.js';
 
@@ -17,6 +17,7 @@ export function openAddToCollectionForm(plantId) {
     document.getElementById('form-plant-repot-days').value = 30;
     document.getElementById('form-plant-repot-hours').value = 0;
     document.getElementById('form-plant-repot-mins').value = 0;
+    document.getElementById('form-plant-qty').value = 1;
 
     window.switchPage('add-to-collection-page');
 }
@@ -36,19 +37,27 @@ export async function saveToCollection(event) {
     const rm = parseInt(document.getElementById('form-plant-repot-mins').value) || 0;
     const repotMinutes = (rd * 24 * 60) + (rh * 60) + rm;
 
-    const userPlant = {
-        instanceId: Date.now(),
-        catalogId: plantId,
-        name: plantData.name,
-        addedDate: new Date().toLocaleDateString('ru-RU'),
-        notes: document.getElementById('form-plant-notes').value,
-        waterIntervalMinutes: waterMinutes,
-        repotIntervalMinutes: repotMinutes,
-        lastWatered: new Date().toISOString(),
-        lastRepotted: new Date().toISOString()
-    };
+    const inputQty = parseInt(document.getElementById('form-plant-qty').value) || 1;
+    const existingPlant = userCollection.find(p => p.name === plantData.name);
 
-    userCollection.push(userPlant);
+    if (existingPlant) {
+        existingPlant.quantity = (Number(existingPlant.quantity) || 0) + inputQty;
+    } else {
+        const userPlant = {
+            instanceId: Date.now(),
+            catalogId: plantId,
+            name: plantData.name,
+            addedDate: new Date().toLocaleDateString('ru-RU'),
+            notes: document.getElementById('form-plant-notes').value,
+            waterIntervalMinutes: waterMinutes,
+            repotIntervalMinutes: repotMinutes,
+            lastWatered: new Date().toISOString(),
+            lastRepotted: new Date().toISOString(),
+            quantity: inputQty
+        };
+        userCollection.push(userPlant);
+    }
+
     await saveCollectionToServer();
     
     window.switchPage('my-plants');
@@ -70,9 +79,10 @@ export function renderCollection() {
         card.className = 'my-plant-card';
         card.setAttribute('data-instance-id', plant.instanceId);
         
-        card.innerHTML = 
+        card.innerHTML =  
             '<h3>' + plant.name + '</h3>' +
             '<p><span class="label">📅 Дата добавления:</span> ' + plant.addedDate + '</p>' +
+            '<p><span class="label">📦 Количество:</span> ' + plant.quantity + ' шт.</p>' +
             (plant.notes ? '<p class="user-note"><span class="label">📝 Заметка:</span> ' + plant.notes + '</p>' : '') +
             '<p><span class="label">🔔 Настройки:</span> Полив каждые ' + plant.waterIntervalMinutes + ' мин.</p>' +
             '<p><span class="label" style="color: #047857;">⏱️ До следующего полива:</span> <span class="timer-water">Загрузка...</span></p>' +
@@ -161,6 +171,10 @@ async function removeFromCollection(instanceId) {
     renderCollection();
     checkNotifications();
 }
+
+
+
+
 
 
 

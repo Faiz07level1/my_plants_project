@@ -34,44 +34,58 @@
       "features": "Растение является мощным природным фильтром и эффективно очищает воздух в помещении от вредных примесей и газов."
     }
   ],
-  "users": [
-    {
-      "id": 1783093097249,
-      "username": "Faiz",
-      "password": "140807"
-    }
-  ],
+  "users": [],
   "collections": {
     "Faiz": [
       {
-        "instanceId": 1783093739178,
-        "catalogId": 1,
+        "instanceId": 1783108202824,
+        "catalogId": 0,
         "name": "Монстера",
-        "addedDate": "03.07.2026",
-        "notes": "",
+        "addedDate": "04.07.2026",
+        "notes": "Получено по обмену",
         "waterIntervalMinutes": 10080,
         "repotIntervalMinutes": 43200,
-        "lastWatered": "2026-07-03T15:48:59.178Z",
-        "lastRepotted": "2026-07-03T15:48:59.178Z"
+        "lastWatered": "2026-07-03T19:50:02.824Z",
+        "lastRepotted": "2026-07-03T19:50:02.824Z",
+        "quantity": 1
+      }
+    ],
+    "Legends": [
+      {
+        "instanceId": 1783108027129,
+        "catalogId": 0,
+        "name": "Монстера",
+        "addedDate": "04.07.2026",
+        "notes": "Получено по обмену",
+        "waterIntervalMinutes": 10080,
+        "repotIntervalMinutes": 43200,
+        "lastWatered": "2026-07-03T19:47:07.127Z",
+        "lastRepotted": "2026-07-03T19:47:07.127Z",
+        "quantity": 1
       },
       {
-        "instanceId": 1783096049751,
-        "catalogId": 1,
-        "name": "Монстера",
-        "addedDate": "03.07.2026",
-        "notes": "",
-        "waterIntervalMinutes": 1,
-        "repotIntervalMinutes": 1,
-        "lastWatered": "2026-07-03T16:27:29.769Z",
-        "lastRepotted": "2026-07-03T16:27:29.769Z"
+        "instanceId": 1783108202826,
+        "catalogId": 0,
+        "name": "Сансевиерия",
+        "addedDate": "04.07.2026",
+        "notes": "Получено по обмену",
+        "waterIntervalMinutes": 10080,
+        "repotIntervalMinutes": 43200,
+        "lastWatered": "2026-07-03T19:50:02.824Z",
+        "lastRepotted": "2026-07-03T19:50:02.824Z",
+        "quantity": 1
       }
     ]
   },
   "tradeOffers": [],
-  "chats": {},
-  "favorites": {
-    "Faiz": [
-      1
+  "chats": {
+    "Faiz-Legends": [
+      {
+        "sender": "Legends",
+        "text": "здарова",
+        "timestamp": 1783107700723
+      }
     ]
-  }
+  },
+  "favorites": {}
 }

@@ -2,6 +2,8 @@ import { checkNotifications } from './notifications.js';
 import { renderCatalog } from './catalog.js';
 import { renderCollection } from './collection.js';
 import { renderFavorites } from './favorites.js';
+import { renderTradeOffers } from './trade.js';
+import { renderChats } from './chats.js';
 
 export function switchPage(pageId) {
     document.querySelectorAll('.page').forEach(function(page) { page.classList.remove('active'); });
@@ -17,9 +19,12 @@ export function switchPage(pageId) {
     if (pageId === 'catalog') renderCatalog();
     if (pageId === 'my-plants') renderCollection();
     if (pageId === 'favorites') renderFavorites();
+    if (pageId === 'trade-page') renderTradeOffers();
+    if (pageId === 'chats-page') renderChats();
     
     checkNotifications();
 }
+
 
 
 

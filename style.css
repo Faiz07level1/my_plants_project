@@ -307,6 +307,38 @@ h1 {
     color: #78350f;
 }
 
+.trade-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 240px;
+}
+.trade-card h3 { font-size: 1.3rem; margin-bottom: 8px; }
+.trade-card p { font-size: 0.9rem; color: #4b5563; margin-bottom: 6px; }
+.chat-tab {
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 8px;
+    background: #f3f4f6;
+    font-weight: 600;
+}
+.chat-tab.active { background: #10b981; color: white; }
+.msg-bubble {
+    padding: 10px 14px;
+    border-radius: 12px;
+    max-width: 70%;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+.msg-bubble.my { background: #10b981; color: white; align-self: flex-end; }
+.msg-bubble.other { background: #e5e7eb; color: #1f2937; align-self: flex-start; }
+
 
 
 
