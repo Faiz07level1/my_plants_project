@@ -233,3 +233,4 @@ function showToast(message) {
 
 renderCatalog();
 setTimeout(checkNotifications, 1000);
+

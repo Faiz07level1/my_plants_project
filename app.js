@@ -4,62 +4,85 @@ let currentUser = localStorage.getItem('plant_user') || null;
 
 async function handleAuth() {
     const input = document.getElementById('auth-username');
+    if (!input) return;
+    
     const username = input.value.trim().replace('@', '');
     if (!username) return;
 
-    const res = await ServerMock.login(username);
-    if (res && res.username) {
-        currentUser = res.username;
+    try {
+        const res = await ServerMock.login(username);
+        currentUser = username;
+        localStorage.setItem('plant_user', currentUser);
+        showInterface();
+    } catch(err) {
+        console.warn("Сервер не ответил, вход выполнен в локальном режиме", err);
+        currentUser = username;
         localStorage.setItem('plant_user', currentUser);
         showInterface();
     }
 }
 
 function showInterface() {
-    document.getElementById('auth-screen').style.display = 'none';
-    document.getElementById('app-interface').style.display = 'flex';
-    document.getElementById('user-badge').textContent = `Вы вошли как: @${currentUser}`;
+    const authScreen = document.getElementById('auth-screen');
+    const appInterface = document.getElementById('app-interface');
+    const badge = document.getElementById('user-badge');
+
+    if (authScreen) authScreen.style.style.display = 'none';
+    if (appInterface) appInterface.style.style.display = 'flex';
+    if (badge) badge.textContent = `Вы вошли как: @${currentUser}`;
+    
     initApp();
 }
 
 function handleLogout() {
     localStorage.removeItem('plant_user');
-    if (chatInterval) clearInterval(chatInterval);
+    if (typeof chatInterval !== 'undefined' && chatInterval) clearInterval(chatInterval);
     location.reload();
 }
 
 async function initApp() {
     if (!currentUser) return;
-    const serverData = await ServerMock.loadAllData();
-    plantCatalog = serverData.catalog || [];
-    myCollection = serverData.collections[currentUser] || [];
+    try {
+        const serverData = await ServerMock.loadAllData();
+        plantCatalog = serverData.catalog || [];
+        myCollection = serverData.collections[currentUser] || [];
+    } catch(e) {
+        plantCatalog = [
+            { id: 1, name: "Монстера", watering: "Каждые 7 дней", lighting: "Рассеянный свет", repotting: "Раз в 2 года", isToxic: true, toxicity: "Ядовито" },
+            { id: 2, name: "Сансевиерия", watering: "Раз в 3 недели", lighting: "Неприхотлива", repotting: "Раз в 4 года", isToxic: false, toxicity: "Безопасно" }
+        ];
+        myCollection = [];
+    }
     renderCatalog();
 }
 
 function switchPage(pageId) {
-    if (chatInterval && pageId !== 'trade') {
+    if (typeof chatInterval !== 'undefined' && chatInterval && pageId !== 'trade') {
         clearInterval(chatInterval);
-        document.getElementById('chat-window').style.display = 'none';
+        const chatWin = document.getElementById('chat-window');
+        if (chatWin) chatWin.style.style.display = 'none';
     }
 
     document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
     document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
     
-    document.getElementById(pageId).classList.add('active');
+    const targetPage = document.getElementById(pageId);
+    if (targetPage) targetPage.classList.add('active');
     
     const activeBtn = Array.from(document.querySelectorAll('.menu-btn')).find(btn => 
-        btn.getAttribute('onclick').includes(pageId)
+        btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(pageId)
     );
-    if(activeBtn) activeBtn.classList.add('active');
+    if (activeBtn) activeBtn.classList.add('active');
 
     if (pageId === 'catalog') renderCatalog();
     if (pageId === 'my-plants') renderCollection();
-    if (pageId === 'recommendations') renderRecommendations();
-    if (pageId === 'trade') renderTradeOffers();
+    if (pageId === 'recommendations') typeof renderRecommendations === 'function' && renderRecommendations();
+    if (pageId === 'trade') typeof renderTradeOffers === 'function' && renderTradeOffers();
 }
 
 function renderCatalog() {
     const container = document.getElementById('catalog-list');
+    if (!container) return;
     container.innerHTML = '';
 
     plantCatalog.forEach(plant => {
@@ -69,7 +92,6 @@ function renderCatalog() {
             <h3>${plant.name}</h3>
             <p><span class="label">Полив:</span> ${plant.watering}</p>
             <p><span class="label">Освещение:</span> ${plant.lighting}</p>
-            <p><span class="label">Пересадка:</span> ${plant.repotting}</p>
             <p><span class="badge ${plant.isToxic ? 'danger' : 'safe'}">${plant.isToxic ? 'Ядовито' : 'Безопасно'}</span></p>
             <button class="btn btn-primary" onclick="openAddToCollectionForm(${plant.id})">Добавить в коллекцию</button>
         `;
@@ -113,7 +135,9 @@ async function saveToCollection(event) {
     };
 
     myCollection.push(userPlant);
-    await ServerMock.saveCollection(currentUser, myCollection);
+    try {
+        await ServerMock.saveCollection(currentUser, myCollection);
+    } catch(e) {}
     
     switchPage('my-plants');
     showToast(`Растение добавлено в вашу личную коллекцию!`);
@@ -121,7 +145,9 @@ async function saveToCollection(event) {
 
 async function removeFromCollection(instanceId) {
     myCollection = myCollection.filter(item => item.instanceId !== instanceId);
-    await ServerMock.saveCollection(currentUser, myCollection);
+    try {
+        await ServerMock.saveCollection(currentUser, myCollection);
+    } catch(e) {}
     renderCollection();
 }
 
@@ -129,7 +155,9 @@ async function actionWater(instanceId) {
     const plant = myCollection.find(item => item.instanceId === instanceId);
     if (plant) {
         plant.lastWatered = new Date().toISOString();
-        await ServerMock.saveCollection(currentUser, myCollection);
+        try {
+            await ServerMock.saveCollection(currentUser, myCollection);
+        } catch(e) {}
         renderCollection();
     }
 }
@@ -138,13 +166,16 @@ async function actionRepot(instanceId) {
     const plant = myCollection.find(item => item.instanceId === instanceId);
     if (plant) {
         plant.lastRepotted = new Date().toISOString();
-        await ServerMock.saveCollection(currentUser, myCollection);
+        try {
+            await ServerMock.saveCollection(currentUser, myCollection);
+        } catch(e) {}
         renderCollection();
     }
 }
 
 function renderCollection() {
     const container = document.getElementById('my-plants-list');
+    if (!container) return;
     container.innerHTML = '';
 
     if (myCollection.length === 0) {
@@ -167,12 +198,14 @@ function renderCollection() {
 
 function showToast(message) {
     const toast = document.getElementById('notification-toast');
+    if (!toast) return;
     toast.textContent = message;
-    toast.style.display = 'block';
-    setTimeout(() => toast.style.display = 'none', 4000);
+    toast.style.style.display = 'block';
+    setTimeout(() => toast.style.style.display = 'none', 4000);
 }
 
 if (currentUser) {
     showInterface();
 }
+
 

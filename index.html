@@ -3,132 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Помощник по уходу за растениями PRO</title>
+    <title>Помощник по уходу за растениями</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Экран авторизации -->
-    <div id="auth-screen">
-        <div class="auth-box">
-            <h2>Вход в систему ухода</h2>
-            <div class="form-group">
-                <label>Придумайте или введите ваш Юзернейм</label>
-                <input type="text" id="auth-username" placeholder="Например: Ivan_Plants" required>
-            </div>
-            <button class="btn btn-primary" onclick="handleAuth()">Войти / Зарегистрироваться</button>
-        </div>
+    <div id="sidebar">
+        <h2>Уход за растениями</h2>
+        <button class="menu-btn active" onclick="switchPage('catalog')">Справочник</button>
+        <button class="menu-btn" onclick="switchPage('my-plants')">Моя коллекция</button>
     </div>
 
-    <!-- Основной интерфейс -->
-    <div id="app-interface" style="display: none;">
-        <div id="sidebar">
-            <h2>Уход за растениями</h2>
-            <div id="user-badge" style="background: #34495e; padding: 10px; border-radius: 4px; font-size: 0.9rem;"></div>
-            <button class="menu-btn active" onclick="switchPage('catalog')">Справочник</button>
-            <button class="menu-btn" onclick="switchPage('my-plants')">Моя коллекция</button>
-            <button class="menu-btn" onclick="switchPage('recommendations')">Рекомендации</button>
-            <button class="menu-btn" onclick="switchPage('trade')">Обмен растениями</button>
-            <button class="btn btn-danger" onclick="handleLogout()" style="margin-top: auto;">Выйти</button>
+    <div id="main-content">
+        <div id="catalog" class="page active">
+            <h1>Справочник растений</h1>
+            <div id="catalog-list" class="grid"></div>
         </div>
 
-        <div id="main-content">
-            <div id="catalog" class="page active">
-                <h1>Справочник растений</h1>
-                <div class="upload-zone">
-                    <label class="btn btn-secondary">
-                        📸 Нажмите для загрузки фото растения
-                        <input type="file" id="photo-recognize" accept="image/*" style="display:none;">
-                    </label>
-                    <div style="margin-top: 15px; display: none;" id="preview-box">
-                        <img id="image-preview" src="" alt="Превью" style="max-width: 200px; max-height: 200px; border-radius: 8px;">
-                    </div>
+        <div id="my-plants" class="page">
+            <h1>Моя коллекция</h1>
+            <div id="my-plants-list" class="grid"></div>
+        </div>
+
+        <div id="add-to-collection-page" class="page">
+            <h1>Добавить растение в коллекцию</h1>
+            <form id="collection-form" onsubmit="saveToCollection(event)" style="max-width: 500px;">
+                <input type="hidden" id="form-plant-id">
+                <div class="form-group">
+                    <label>Название растения</label>
+                    <input type="text" id="form-plant-name" readonly>
                 </div>
-                <div id="catalog-list" class="grid"></div>
-            </div>
-
-            <div id="my-plants" class="page">
-                <h1>Моя коллекция</h1>
-                <div id="my-plants-list" class="grid"></div>
-            </div>
-
-            <div id="recommendations" class="page">
-                <h1>Умные рекомендации</h1>
-                <div id="recommendations-list" class="grid"></div>
-            </div>
-
-            <div id="trade" class="page">
-                <h1>Обменная площадка</h1>
-                <button class="btn btn-primary" onclick="openCreateTradeForm()">Выставить растение на обмен</button>
-                
-                <div class="trade-container" style="display: flex; gap: 20px; margin-top: 20px;">
-                    <div style="flex: 2;">
-                        <h3>Общая лента предложений</h3>
-                        <div id="trade-list" class="grid"></div>
-                    </div>
-                    <div id="chat-window" style="flex: 1; display: none;" class="card">
-                        <h3 id="chat-title">Чат обмена</h3>
-                        <div id="chat-messages" style="height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; margin: 10px 0; border-radius: 4px; background: #fafafa;"></div>
-                        <div style="display: flex; gap: 5px;">
-                            <input type="text" id="chat-input" placeholder="Введите сообщение..." style="flex: 1; padding: 5px;">
-                            <button class="btn btn-primary" onclick="sendMessage()">Отправить</button>
-                        </div>
-                    </div>
+                <div class="form-group">
+                    <label>Заметки по уходу</label>
+                    <textarea id="form-plant-notes" rows="3" placeholder="Например: стоит на южном окне"></textarea>
                 </div>
-            </div>
-
-            <div id="add-to-collection-page" class="page">
-                <h1>Добавить растение в коллекцию</h1>
-                <form id="collection-form" onsubmit="saveToCollection(event)" style="max-width: 500px;">
-                    <input type="hidden" id="form-plant-id">
-                    <div class="form-group">
-                        <label>Название растения</label>
-                        <input type="text" id="form-plant-name" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label>Заметки по уходу</label>
-                        <textarea id="form-plant-notes" rows="3"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Интервал полива (в днях)</label>
-                        <input type="number" id="form-plant-water-interval" min="1" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Интервал пересадки (в месяцах)</label>
-                        <input type="number" id="form-plant-repot-interval" min="1" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Сохранить в коллекцию</button>
-                    <button type="button" class="btn btn-secondary" onclick="switchPage('catalog')">Отмена</button>
-                </form>
-            </div>
-
-            <div id="create-trade-page" class="page">
-                <h1>Выставить растение на обмен</h1>
-                <form id="trade-form" onsubmit="saveTradeOffer(event)" style="max-width: 500px;">
-                    <div class="form-group">
-                        <label>Какое растение отдаете?</label>
-                        <select id="trade-my-plant" required></select>
-                    </div>
-                    <div class="form-group">
-                        <label>Что хотите взамен?</label>
-                        <input type="text" id="trade-preferences" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Опубликовать в общую ленту</button>
-                    <button type="button" class="btn btn-secondary" onclick="switchPage('trade')">Отмена</button>
-                </form>
-            </div>
+                <div class="form-group">
+                    <label>Интервал полива (в днях)</label>
+                    <input type="number" id="form-plant-water-interval" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label>Интервал пересадки (в месяцах)</label>
+                    <input type="number" id="form-plant-repot-interval" min="1" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Сохранить в коллекцию</button>
+                <button type="button" class="btn btn-secondary" onclick="switchPage('catalog')">Отмена</button>
+            </form>
         </div>
     </div>
 
     <div id="notification-toast"></div>
 
-    <script src="serverMock.js"></script>
-    <script src="recognition.js"></script>
-    <script src="recommendations.js"></script>
-    <script src="trade.js"></script>
-    <script src="app.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
+
 
 
 
