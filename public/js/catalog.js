@@ -7,8 +7,30 @@ export function renderCatalog() {
     if (!container) return;
     container.innerHTML = '';
     
-    // Передаем актуальные массивы, которые к этому моменту уже скачались
+    const searchInput = document.getElementById('catalog-search');
+    if (searchInput) searchInput.value = '';
+
     renderPlantGrid(plantCatalog, container, true);
+}
+
+export function handleCatalogSearch() {
+    const container = document.getElementById('catalog-list');
+    const searchInput = document.getElementById('catalog-search');
+    if (!container || !searchInput) return;
+
+    const query = searchInput.value.toLowerCase().trim();
+    container.innerHTML = '';
+
+    const filteredPlants = plantCatalog.filter(plant => 
+        plant.name.toLowerCase().includes(query)
+    );
+
+    if (filteredPlants.length === 0) {
+        container.innerHTML = '<p style="color: #6b7280; font-style: italic; padding: 10px;">Растения с таким названием не найдены.</p>';
+        return;
+    }
+
+    renderPlantGrid(filteredPlants, container, true);
 }
 
 export function renderPlantGrid(list, container, showAddBtn) {
@@ -17,7 +39,6 @@ export function renderPlantGrid(list, container, showAddBtn) {
         cardContainer.className = 'card-container';
         cardContainer.setAttribute('id', 'catalog-card-' + plant.id);
         
-        // Проверяем сердечко напрямую из актуального массива, скачанного с сервера
         let isFav = userFavorites.includes(plant.id);
         let heartIcon = isFav ? '❤️' : '🤍';
         let badgeClass = plant.isToxic ? 'danger' : 'safe';
@@ -68,6 +89,7 @@ export function showCatalogCard(catalogId) {
         }
     }, 100);
 }
+
 
 
 
