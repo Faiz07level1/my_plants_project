@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Помощник по уходу за растениями</title>
+    <title>Помощник по уходу за растениями PRO</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -12,6 +12,12 @@
         <h2>Уход за растениями</h2>
         <button class="menu-btn active" onclick="switchPage('catalog')">Справочник</button>
         <button class="menu-btn" onclick="switchPage('my-plants')">Моя коллекция</button>
+        <button class="menu-btn" onclick="switchPage('favorites')">Избранное</button>
+        
+        <div id="alert-panel" style="display: none;">
+            <div class="alert-title">🚨 Внимание!</div>
+            <ul id="alert-list"></ul>
+        </div>
     </div>
 
     <div id="main-content">
@@ -23,6 +29,11 @@
         <div id="my-plants" class="page">
             <h1>Моя коллекция</h1>
             <div id="my-plants-list" class="grid"></div>
+        </div>
+
+        <div id="favorites" class="page">
+            <h1>Избранные растения</h1>
+            <div id="favorites-list" class="grid"></div>
         </div>
 
         <div id="add-to-collection-page" class="page">
@@ -56,6 +67,8 @@
     <script type="module" src="script.js"></script>
 </body>
 </html>
+
+
 
 
 
