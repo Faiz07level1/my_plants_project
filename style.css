@@ -212,6 +212,7 @@ h1 {
 .badge.danger { background-color: #fee2e2; color: #991b1b; }
 .badge.safe { background-color: #d1fae5; color: #065f46; }
 
+/* Стилизация всех кнопок в системе */
 .btn {
     padding: 10px 16px;
     border: none;
@@ -221,6 +222,8 @@ h1 {
     font-size: 0.9rem;
     width: 100%;
     transition: background 0.2s;
+    text-align: center;
+    display: block;
 }
 
 .btn-primary { background-color: #10b981; color: white; }
@@ -228,6 +231,7 @@ h1 {
 .btn-secondary { background-color: #f3f4f6; color: #374151; border: 1px solid #e5e7eb; }
 .btn-secondary:hover { background-color: #e5e7eb; }
 .btn-danger { background-color: #ef4444; color: white; }
+.btn-danger:hover { background-color: #dc2626; }
 
 .form-group {
     margin-bottom: 20px;
@@ -260,6 +264,7 @@ h1 {
     z-index: 10000;
 }
 
+/* Стилизация личной коллекции пользователя */
 .my-plant-card {
     background: #fff;
     border-radius: 12px;
@@ -268,8 +273,24 @@ h1 {
     border: 1px solid #e5e7eb;
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    transition: border-color 0.3s;
+    gap: 14px;
+}
+
+.my-plant-card p {
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.my-plant-card .label {
+    font-weight: 700;
+    color: #4b5563;
+}
+
+.my-plant-card .btn-water, 
+.my-plant-card .btn-repot, 
+.my-plant-card .btn-link, 
+.my-plant-card .btn-remove {
+    margin-top: 4px;
 }
 
 .my-plant-card.alert-active {
@@ -285,6 +306,8 @@ h1 {
     font-style: italic;
     color: #78350f;
 }
+
+
 
 
 

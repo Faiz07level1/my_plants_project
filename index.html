@@ -48,14 +48,43 @@
                     <label>Заметки по уходу</label>
                     <textarea id="form-plant-notes" rows="3" placeholder="Например: стоит на южном окне"></textarea>
                 </div>
+                
                 <div class="form-group">
-                    <label>Интервал полива (в днях)</label>
-                    <input type="number" id="form-plant-water-interval" min="1" required>
+                    <label>Интервал полива</label>
+                    <div style="display: flex; gap: 10px;">
+                        <div style="flex: 1;">
+                            <span style="font-size: 0.8rem; color: #6b7280;">Дни</span>
+                            <input type="number" id="form-plant-water-days" min="0" value="7" style="width: 100%;">
+                        </div>
+                        <div style="flex: 1;">
+                            <span style="font-size: 0.8rem; color: #6b7280;">Часы</span>
+                            <input type="number" id="form-plant-water-hours" min="0" max="23" value="0" style="width: 100%;">
+                        </div>
+                        <div style="flex: 1;">
+                            <span style="font-size: 0.8rem; color: #6b7280;">Минуты</span>
+                            <input type="number" id="form-plant-water-mins" min="0" max="59" value="0" style="width: 100%;">
+                        </div>
+                    </div>
                 </div>
+
                 <div class="form-group">
-                    <label>Интервал пересадки (в месяцах)</label>
-                    <input type="number" id="form-plant-repot-interval" min="1" required>
+                    <label>Интервал пересадки</label>
+                    <div style="display: flex; gap: 10px;">
+                        <div style="flex: 1;">
+                            <span style="font-size: 0.8rem; color: #6b7280;">Дни</span>
+                            <input type="number" id="form-plant-repot-days" min="0" value="30" style="width: 100%;">
+                        </div>
+                        <div style="flex: 1;">
+                            <span style="font-size: 0.8rem; color: #6b7280;">Часы</span>
+                            <input type="number" id="form-plant-repot-hours" min="0" max="23" value="0" style="width: 100%;">
+                        </div>
+                        <div style="flex: 1;">
+                            <span style="font-size: 0.8rem; color: #6b7280;">Минуты</span>
+                            <input type="number" id="form-plant-repot-mins" min="0" max="59" value="0" style="width: 100%;">
+                        </div>
+                    </div>
                 </div>
+
                 <button type="submit" class="btn btn-primary">Сохранить в коллекцию</button>
                 <button type="button" class="btn btn-secondary" onclick="switchPage('catalog')">Отмена</button>
             </form>
@@ -67,6 +96,9 @@
     <script type="module" src="script.js"></script>
 </body>
 </html>
+
+
+
 
 
 

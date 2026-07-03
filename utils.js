@@ -1,14 +1,21 @@
-export function getDaysStatus(lastActionISO, intervalDays) {
+export function getTimeLeft(lastActionISO, intervalMinutes, overdueText) {
     const lastAction = new Date(lastActionISO);
-    const nextAction = new Date(lastAction.getTime() + (intervalDays * 24 * 60 * 60 * 1000));
-    return Math.ceil((nextAction - new Date()) / (1000 * 60 * 60 * 24));
-}
+    const nextAction = new Date(lastAction.getTime() + (intervalMinutes * 60 * 1000));
+    const diffTime = nextAction - new Date();
 
-export function getMonthsStatus(lastActionISO, intervalMonths) {
-    const lastAction = new Date(lastActionISO);
-    const nextAction = new Date(lastAction);
-    nextAction.setMonth(nextAction.getMonth() + intervalMonths);
-    return Math.ceil((nextAction - new Date()) / (1000 * 60 * 60 * 24));
+    if (diffTime <= 0) {
+        return { isOverdue: true, text: overdueText };
+    }
+
+    const days = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diffTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diffTime % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diffTime % (1000 * 60)) / 1000);
+
+    return {
+        isOverdue: false,
+        text: days + " дн. " + hours + " ч. " + minutes + " мин. " + seconds + " сек."
+    };
 }
 
 export function showToast(message) {
@@ -35,6 +42,14 @@ export function sendSystemNotification(title, text) {
         });
     }
 }
+
+
+
+
+
+
+
+
 
 
 
