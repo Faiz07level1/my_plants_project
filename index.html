@@ -32,6 +32,14 @@
 
         <div id="my-plants" class="page">
             <h1>Моя коллекция</h1>
+            
+            <div style="background: #eff6ff; border: 1px solid #bfdbfe; padding: 16px; border-radius: 12px; margin-bottom: 24px; max-width: 500px;">
+                <h3 style="margin-bottom: 8px; color: #1e40af; font-size: 1.1rem;">💡 Умный подбор растений</h3>
+                <p style="font-size: 0.85rem; color: #1e3a8a; margin-bottom: 12px;">Система проанализирует ваши цветы и посоветует идеального кандидата для расширения домашнего сада.</p>
+                <button class="btn btn-primary" onclick="window.getRecommendations()" style="width: auto; padding: 8px 20px; font-size: 0.85rem; background-color: #3b82f6;">Подобрать растения</button>
+                <div id="recommendations-box" style="margin-top: 14px; display: none;"></div>
+            </div>
+
             <div id="my-plants-list" class="grid"></div>
         </div>
 
@@ -159,6 +167,7 @@
     <script type="module" src="script.js"></script>
 </body>
 </html>
+
 
 
 

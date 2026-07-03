@@ -8,6 +8,7 @@ import { requestNotificationPermission } from './utils.js';
 import { initAuth, toggleAuthForms, handleLogin, handleSignup } from './auth.js';
 import { openCreateOfferModal, closeCreateOfferModal, handleCreateOffer, handleTradePlantChange, cancelTradeOffer } from './trade.js';
 import { handleSendMessage, startChatWith, executeTrade } from './chats.js';
+import { getRecommendations } from './recommendations.js';
 
 window.switchPage = switchPage;
 window.toggleFavorite = toggleFavorite;
@@ -24,6 +25,7 @@ window.startChatWith = startChatWith;
 window.handleTradePlantChange = handleTradePlantChange;
 window.cancelTradeOffer = cancelTradeOffer;
 window.executeTrade = executeTrade;
+window.getRecommendations = getRecommendations;
 
 async function startApplication() {
     await initAuth();
@@ -40,6 +42,7 @@ async function startApplication() {
 }
 
 startApplication();
+
 
 
 
