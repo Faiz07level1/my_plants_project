@@ -1,89 +1,76 @@
-const plantCatalog = [
-    {
-        id: 1,
-        name: "Монстера",
-        watering: "Обильный после просыхания верхнего слоя земли (каждые 7 дней).",
-        lighting: "Яркий рассеянный свет, полутень. Избегать прямых лучей.",
-        repotting: "Молодые ежегодно весной, взрослые раз в 2-3 года.",
-        toxicity: "Ядовито для домашних животных (вызывает раздражение).",
-        isToxic: true,
-        features: "Листья нужно регулярно протирать от пыли и опрыскивать."
-    },
-    {
-        id: 2,
-        name: "Сансевиерия (Тещин язык)",
-        watering: "Редкий. Раз в 2-3 недели летом, зимой раз в месяц.",
-        lighting: "Неприхотлива. Растет как на солнце, так и в глубине комнаты.",
-        repotting: "Только когда корни заполнят весь горшок (раз в 3-4 года).",
-        toxicity: "Слабо ядовито при поедании.",
-        isToxic: true,
-        features: "Боится избытка влаги и застоя воды в розетке."
-    },
-    {
-        id: 3,
-        name: "Хлорофитум",
-        watering: "Умеренный. Летом 2 раза в неделю, зимой 1 раз в неделю.",
-        lighting: "Яркий рассеянный свет или полутень.",
-        repotting: "Ежегодно весной, так как корни растут очень быстро.",
-        toxicity: "Безопасно для людей и животных.",
-        isToxic: false,
-        features: "Отлично очищает воздух в помещении."
-    },
-    {
-        id: 4,
-        name: "Фикус Бенджамина",
-        watering: "Регулярный без переувлажнения. Примерно 2 раза в неделю.",
-        lighting: "Яркий свет без прямых солнечных лучей.",
-        repotting: "Молодые каждый год, взрослые раз в 2-4 года.",
-        toxicity: "Сок может вызвать раздражение кожи.",
-        isToxic: true,
-        features: "Не любит частые перестановки и сквозняки (может сбросить листья)."
-    }
-];
+import { plantCatalog } from './data.js';
+import { getDaysStatus, getMonthsStatus, showToast } from './utils.js';
 
 let myCollection = JSON.parse(localStorage.getItem('my_plant_collection')) || [];
 
 function switchPage(pageId) {
-    document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-    document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(function(page) {
+        page.classList.remove('active');
+    });
+    document.querySelectorAll('.menu-btn').forEach(function(btn) {
+        btn.classList.remove('active');
+    });
     
     document.getElementById(pageId).classList.add('active');
     
-    const activeBtn = Array.from(document.querySelectorAll('.menu-btn')).find(btn => 
-        btn.getAttribute('onclick').includes(pageId)
-    );
-    if(activeBtn) activeBtn.classList.add('active');
+    const activeBtn = Array.from(document.querySelectorAll('.menu-btn')).find(function(btn) {
+        return btn.getAttribute('onclick').includes(pageId);
+    });
+    if (activeBtn) activeBtn.classList.add('active');
 
     if (pageId === 'catalog') renderCatalog();
     if (pageId === 'my-plants') renderCollection();
 }
 
+window.switchPage = switchPage;
+
 function renderCatalog() {
     const container = document.getElementById('catalog-list');
     container.innerHTML = '';
 
-    plantCatalog.forEach(plant => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-            <h3>${plant.name}</h3>
-            <p><span class="label">Полив:</span> ${plant.watering}</p>
-            <p><span class="label">Освещение:</span> ${plant.lighting}</p>
-            <p><span class="label">Пересадка:</span> ${plant.repotting}</p>
-            <p><span class="label">Особенности:</span> ${plant.features}</p>
-            <p>
-                <span class="badge ${plant.isToxic ? 'danger' : 'safe'}">
-                    ${plant.toxicity}
-                </span>
-            </p>
-            <button class="btn btn-primary" onclick="openAddToCollectionForm(${plant.id})">Добавить в личный список</button>
-        `;
-        container.appendChild(card);
+    plantCatalog.forEach(function(plant) {
+        const cardContainer = document.createElement('div');
+        cardContainer.className = 'card-container';
+        
+        let badgeClass = plant.isToxic ? 'danger' : 'safe';
+        
+        cardContainer.innerHTML = 
+            '<div class="card-inner">' +
+                '<div class="card-front">' +
+                    '<h3>' + plant.name + '</h3>' +
+                    '<div class="plant-img" style="background-image: url(\'' + plant.img + '\'); background-size: cover; background-position: center; font-size: 0;"></div>' +
+                    '<button class="btn btn-secondary btn-flip">Посмотреть</button>' +
+                '</div>' +
+                '<div class="card-back">' +
+                    '<h3>' + plant.name + '</h3>' +
+                    '<p><span class="label">Полив:</span> ' + plant.watering + '</p>' +
+                    '<p><span class="label">Освещение:</span> ' + plant.lighting + '</p>' +
+                    '<p><span class="label">Пересадка:</span> ' + plant.repotting + '</p>' +
+                    '<p><span class="badge ' + badgeClass + '">' + plant.toxicity + '</span></p>' +
+                    '<div style="display:flex; gap:10px; width:100%; margin-top:auto;">' +
+                        '<button class="btn btn-primary btn-add" data-id="' + plant.id + '">Добавить</button>' +
+                        '<button class="btn btn-secondary btn-flip">Назад</button>' +
+                    '</div>' +
+                '</div>' +
+            '</div>';
+        
+        cardContainer.addEventListener('click', function(e) {
+            if (e.target.classList.contains('btn-add')) {
+                const plantId = parseInt(e.target.getAttribute('data-id'));
+                openAddToCollectionForm(plantId);
+            } else {
+                cardContainer.classList.toggle('flipped');
+            }
+        });
+        
+        container.appendChild(cardContainer);
     });
 }
 
 function openAddToCollectionForm(plantId) {
-    const plant = plantCatalog.find(p => p.id === plantId);
+    const plant = plantCatalog.find(function(p) {
+        return p.id === plantId;
+    });
     if (!plant) return;
 
     document.getElementById('form-plant-id').value = plant.id;
@@ -103,7 +90,9 @@ function saveToCollection(event) {
     const waterInterval = parseInt(document.getElementById('form-plant-water-interval').value);
     const repotInterval = parseInt(document.getElementById('form-plant-repot-interval').value);
     
-    const plantData = plantCatalog.find(p => p.id === plantId);
+    const plantData = plantCatalog.find(function(p) {
+        return p.id === plantId;
+    });
 
     const userPlant = {
         instanceId: Date.now(),
@@ -121,51 +110,42 @@ function saveToCollection(event) {
     localStorage.setItem('my_plant_collection', JSON.stringify(myCollection));
     
     switchPage('my-plants');
-    showToast(`Растение "${userPlant.name}" успешно добавлено!`);
+    showToast('Растение успешно добавлено!');
 }
 
+window.saveToCollection = saveToCollection;
+
 function removeFromCollection(instanceId) {
-    myCollection = myCollection.filter(item => item.instanceId !== instanceId);
+    myCollection = myCollection.filter(function(item) {
+        return item.instanceId !== instanceId;
+    });
     localStorage.setItem('my_plant_collection', JSON.stringify(myCollection));
     renderCollection();
     showToast("Растение удалено из коллекции");
 }
 
 function actionWater(instanceId) {
-    const plant = myCollection.find(item => item.instanceId === instanceId);
+    const plant = myCollection.find(function(item) {
+        return item.instanceId === instanceId;
+    });
     if (plant) {
         plant.lastWatered = new Date().toISOString();
         localStorage.setItem('my_plant_collection', JSON.stringify(myCollection));
         renderCollection();
-        showToast(`Запись обновлена: "${plant.name}" полито!`);
+        showToast("Полито!");
     }
 }
 
 function actionRepot(instanceId) {
-    const plant = myCollection.find(item => item.instanceId === instanceId);
+    const plant = myCollection.find(function(item) {
+        return item.instanceId === instanceId;
+    });
     if (plant) {
         plant.lastRepotted = new Date().toISOString();
         localStorage.setItem('my_plant_collection', JSON.stringify(myCollection));
         renderCollection();
-        showToast(`Запись обновлена: "${plant.name}" пересажено!`);
+        showToast("Пересажено!");
     }
-}
-
-function getDaysStatus(lastActionISO, intervalDays) {
-    const lastAction = new Date(lastActionISO);
-    const nextAction = new Date(lastAction.getTime() + (intervalDays * 24 * 60 * 60 * 1000));
-    const diffTime = nextAction - new Date();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
-}
-
-function getMonthsStatus(lastActionISO, intervalMonths) {
-    const lastAction = new Date(lastActionISO);
-    const nextAction = new Date(lastAction);
-    nextAction.setMonth(nextAction.getMonth() + intervalMonths);
-    const diffTime = nextAction - new Date();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
 }
 
 function renderCollection() {
@@ -177,60 +157,51 @@ function renderCollection() {
         return;
     }
 
-    myCollection.forEach(plant => {
+    myCollection.forEach(function(plant) {
         const waterDaysLeft = getDaysStatus(plant.lastWatered, plant.waterInterval);
         const repotDaysLeft = getMonthsStatus(plant.lastRepotted, plant.repotInterval);
 
-        let waterStatusText = waterDaysLeft > 0 ? `Через ${waterDaysLeft} дн.` : "Требуется полив!";
-        let repotStatusText = repotDaysLeft > 0 ? `Через ${repotDaysLeft} дн.` : "Требуется пересадка!";
+        let waterStatusText = waterDaysLeft > 0 ? "Через " + waterDaysLeft + " дн." : "Требуется полив!";
+        let repotStatusText = repotDaysLeft > 0 ? "Через " + repotDaysLeft + " дн." : "Требуется пересадка!";
 
         const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-            <h3>${plant.name}</h3>
-            <p><span class="label">Дата добавления:</span> ${plant.addedDate}</p>
-            ${plant.notes ? `<p class="user-note"><span class="label">Заметка:</span> ${plant.notes}</p>` : ''}
-            
-            <p>
-                <span class="label">Полив:</span> ${waterStatusText} 
-                <button class="btn btn-secondary" style="padding: 3px 6px; font-size: 0.8rem; margin-left: 5px;" onclick="actionWater(${plant.instanceId})">Полил(а)</button>
-            </p>
-            
-            <p>
-                <span class="label">Пересадка:</span> ${repotStatusText}
-                <button class="btn btn-secondary" style="padding: 3px 6px; font-size: 0.8rem; margin-left: 5px;" onclick="actionRepot(${plant.instanceId})">Пересадил(а)</button>
-            </p>
-            
-            <button class="btn btn-danger" onclick="removeFromCollection(${plant.instanceId})">Удалить</button>
-        `;
+        card.className = 'my-plant-card';
+        card.innerHTML = 
+            '<h3>' + plant.name + '</h3>' +
+            '<p><span class="label">Дата добавления:</span> ' + plant.addedDate + '</p>' +
+            (plant.notes ? '<p class="user-note"><span class="label">Заметка:</span> ' + plant.notes + '</p>' : '') +
+            '<p><span class="label">Полив:</span> ' + waterStatusText + '</p>' +
+            '<p><span class="label">Пересадка:</span> ' + repotStatusText + '</p>' +
+            '<div style="display:flex; gap:10px; margin-top:10px;">' +
+                '<button class="btn btn-secondary btn-water">Полил(а)</button>' +
+                '<button class="btn btn-secondary btn-repot">Пересадил(а)</button>' +
+            '</div>' +
+            '<button class="btn btn-danger btn-remove" style="margin-top:10px;">Удалить</button>';
+        
+        card.addEventListener('click', function(e) {
+            if (e.target.classList.contains('btn-water')) actionWater(plant.instanceId);
+            if (e.target.classList.contains('btn-repot')) actionRepot(plant.instanceId);
+            if (e.target.classList.contains('btn-remove')) removeFromCollection(plant.instanceId);
+        });
+
         container.appendChild(card);
     });
 }
 
 function checkNotifications() {
     let alerts = [];
-    myCollection.forEach(plant => {
-        const waterDaysLeft = getDaysStatus(plant.lastWatered, plant.waterInterval);
-        const repotDaysLeft = getMonthsStatus(plant.lastRepotted, plant.repotInterval);
-
-        if (waterDaysLeft <= 0) alerts.push(`Полить "${plant.name}"`);
-        if (repotDaysLeft <= 0) alerts.push(`Пересадить "${plant.name}"`);
+    myCollection.forEach(function(plant) {
+        if (getDaysStatus(plant.lastWatered, plant.waterInterval) <= 0) alerts.push("Полить " + plant.name);
+        if (getMonthsStatus(plant.lastRepotted, plant.repotInterval) <= 0) alerts.push("Пересадить " + plant.name);
     });
-
     if (alerts.length > 0) {
-        showToast(`Напоминание: ${alerts.slice(0, 2).join(', ')}${alerts.length > 2 ? ' и другие задачи...' : ''}`);
+        showToast("Напоминание: " + alerts.slice(0, 2).join(', '));
     }
-}
-
-function showToast(message) {
-    const toast = document.getElementById('notification-toast');
-    toast.textContent = message;
-    toast.style.display = 'block';
-    setTimeout(() => {
-        toast.style.display = 'none';
-    }, 5000);
 }
 
 renderCatalog();
 setTimeout(checkNotifications, 1000);
+
+
+
 
