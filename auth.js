@@ -15,16 +15,11 @@ function hideAuthModal() {
     if (modal) modal.style.display = 'none';
 }
 
-// Показываем имя текущего пользователя в шапке сайдбара
 function updateUserBar(username) {
     const nameEl = document.getElementById('current-user-name');
     if (nameEl) nameEl.textContent = username || '—';
 }
 
-// Смена пользователя: очищаем localStorage и возвращаемся к экрану входа.
-// Отдельной страницы login.html в проекте нет — вход оформлен как модальное
-// окно поверх index.html, поэтому просто перезагружаем страницу: при
-// отсутствии current_user в localStorage initAuth() снова покажет это окно.
 export function switchAccount() {
     const confirmed = confirm('Сменить пользователя? Вы выйдете из текущего аккаунта.');
     if (!confirmed) return;
