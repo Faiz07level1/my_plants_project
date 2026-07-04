@@ -1,0 +1,12 @@
+
+node_modules/
+dist/
+npm-debug.log*
+database.json
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+.env
+uploads/

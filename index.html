@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Помощник по уходу за растениями PRO</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="auth-modal" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #f8faf9; z-index: 99999; display: flex; align-items: center; justify-content: center; padding: 20px;">
+        <div id="login-form-box" style="background: white; padding: 32px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); width: 100%; max-width: 400px;">
+            <h2 style="margin-bottom: 20px; font-weight: 800; color: #1f2937;">Вход в систему</h2>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>Имя пользователя</label>
+                    <input type="text" id="login-username" required>
+                </div>
+                <div class="form-group" style="margin-top: 12px;">
+                    <label>Пароль</label>
+                    <input type="password" id="login-password" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin-top: 20px; width: 100%;">Войти</button>
+            </form>
+            <p style="margin-top: 16px; font-size: 0.9rem; text-align: center; color: #6b7280;">
+                Нет аккаунта? <a href="#" onclick="toggleAuthForms(event, 'signup')" style="color: #10b981; font-weight: 600; text-decoration: none;">Зарегистрироваться</a>
+            </p>
+        </div>
+        <div id="signup-form-box" style="background: white; padding: 32px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); width: 100%; max-width: 400px; display: none;">
+            <h2 style="margin-bottom: 20px; font-weight: 800; color: #1f2937;">Регистрация</h2>
+            <form onsubmit="handleSignup(event)">
+                <div class="form-group">
+                    <label>Создайте никнейм</label>
+                    <input type="text" id="signup-username" required>
+                </div>
+                <div class="form-group" style="margin-top: 12px;">
+                    <label>Создайте пароль</label>
+                    <input type="password" id="signup-password" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin-top: 20px; width: 100%;">Зарегистрироваться</button>
+            </form>
+            <p style="margin-top: 16px; font-size: 0.9rem; text-align: center; color: #6b7280;">
+                Уже есть аккаунт? <a href="#" onclick="toggleAuthForms(event, 'login')" style="color: #10b981; font-weight: 600; text-decoration: none;">Войти</a>
+            </p>
+        </div>
+    </div>
+
+    <div id="sidebar">
+        <div class="sidebar-header-row">
+            <h2>Уход за растениями</h2>
+            <button id="theme-toggle-btn" onclick="toggleTheme()" title="Включить тёмную тему">🌙</button>
+        </div>
+
+        <div id="user-bar">
+            <div>
+                <div class="current-user-label">Вы вошли как:</div>
+                <div class="current-user-name" id="current-user-name">—</div>
+            </div>
+            <button class="btn-switch-user" onclick="switchAccount()">🔄 Сменить пользователя</button>
+        </div>
+
+        <button class="menu-btn active" onclick="switchPage('catalog')">Справочник</button>
+        <button class="menu-btn" onclick="switchPage('my-plants')">Моя коллекция</button>
+        <button class="menu-btn" onclick="switchPage('favorites')">Избранное</button>
+        <button class="menu-btn" onclick="switchPage('chat-select')">💬 Обсуждения</button>
+        <button class="menu-btn" onclick="switchPage('messenger')">
+            💬 Общение
+            <span id="messenger-badge" class="menu-badge" style="display:none;">0</span>
+        </button>
+        <button class="menu-btn" onclick="switchPage('trade')">🔄 Обмен</button>
+        <button class="menu-btn" onclick="switchPage('recognize')">📷 Распознать</button>
+        
+        <div id="alert-panel" style="display: none;">
+            <div class="alert-title">🚨 Внимание!</div>
+            <ul id="alert-list"></ul>
+        </div>
+    </div>
+
+    <div id="main-content">
+        <div id="catalog" class="page active">
+            <h1>Справочник растений</h1>
+            <input type="text" id="catalog-search" placeholder="🔍 Поиск растения по названию..." oninput="filterCatalog(this.value)">
+
+            <div id="catalog-filters" class="filter-bar">
+                <button class="filter-btn active" data-filter="all" onclick="setActiveFilter('all')">🌿 Все растения</button>
+                <button class="filter-btn" data-filter="indoor" onclick="setActiveFilter('indoor')">🏠 Комнатные</button>
+                <button class="filter-btn" data-filter="toxic" onclick="setActiveFilter('toxic')">☠️ Ядовитые</button>
+                <button class="filter-btn" data-filter="thorny" onclick="setActiveFilter('thorny')">🌵 Колючие</button>
+                <button class="filter-btn" data-filter="flowering" onclick="setActiveFilter('flowering')">🌸 Цветущие</button>
+                <button class="filter-btn" data-filter="edible" onclick="setActiveFilter('edible')">🍽 Съедобные</button>
+                <button class="filter-btn" data-filter="medicinal" onclick="setActiveFilter('medicinal')">💊 Лекарственные</button>
+            </div>
+
+            <div id="catalog-list" class="grid"></div>
+        </div>
+
+        <div id="my-plants" class="page">
+            <h1>Моя коллекция</h1>
+            <div id="my-plants-list" class="grid"></div>
+        </div>
+
+        <div id="favorites" class="page">
+            <h1>Избранные растения</h1>
+            <div id="favorites-list" class="grid"></div>
+        </div>
+
+        <div id="add-to-collection-page" class="page">
+            <h1>Добавить растение в коллекцию</h1>
+            <form id="collection-form" onsubmit="saveToCollection(event)" style="max-width: 500px;">
+                <input type="hidden" id="form-plant-id">
+                <div class="form-group">
+                    <label>Название растения</label>
+                    <input type="text" id="form-plant-name" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Заметки по уходу</label>
+                    <textarea id="form-plant-notes" rows="3" placeholder="Например: стоит на южном окне"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Интервал полива</label>
+                    <div style="display: flex; gap: 10px;">
+                        <div style="flex: 1;">
+                            <span style="font-size: 0.8rem; color: #6b7280;">Дни</span>
+                            <input type="number" id="form-plant-water-days" min="0" value="7" style="width: 100%;">
+                        </div>
+                        <div style="flex: 1;">
+                            <span style="font-size: 0.8rem; color: #6b7280;">Часы</span>
+                            <input type="number" id="form-plant-water-hours" min="0" max="23" value="0" style="width: 100%;">
+                        </div>
+                        <div style="flex: 1;">
+                            <span style="font-size: 0.8rem; color: #6b7280;">Минуты</span>
+                            <input type="number" id="form-plant-water-mins" min="0" max="59" value="0" style="width: 100%;">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Интервал пересадки</label>
+                    <div style="display: flex; gap: 10px;">
+                        <div style="flex: 1;">
+                            <span style="font-size: 0.8rem; color: #6b7280;">Дни</span>
+                            <input type="number" id="form-plant-repot-days" min="0" value="30" style="width: 100%;">
+                        </div>
+                        <div style="flex: 1;">
+                            <span style="font-size: 0.8rem; color: #6b7280;">Часы</span>
+                            <input type="number" id="form-plant-repot-hours" min="0" max="23" value="0" style="width: 100%;">
+                        </div>
+                        <div style="flex: 1;">
+                            <span style="font-size: 0.8rem; color: #6b7280;">Минуты</span>
+                            <input type="number" id="form-plant-repot-mins" min="0" max="59" value="0" style="width: 100%;">
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Сохранить в коллекцию</button>
+                <button type="button" class="btn btn-secondary" onclick="switchPage('catalog')">Отмена</button>
+            </form>
+        </div>
+        <div id="chat-select" class="page">
+            <h1>Обсуждения</h1>
+            <p>Выберите растение, чтобы перейти к обсуждению:</p>
+            <div id="chat-select-list" class="chat-select-list"></div>
+        </div>
+
+        <div id="chat" class="page">
+            <div class="chat-header-row">
+                <h1 id="chat-plant-title" style="margin-bottom:0;">Обсуждение</h1>
+                <button class="btn btn-secondary" onclick="switchPage('chat-select')">← Назад к списку</button>
+            </div>
+            <div id="chat-messages" class="chat-box"></div>
+            <form id="chat-form" class="chat-form" onsubmit="sendChatMessage(event)">
+                <input type="text" id="chat-input" placeholder="Напишите сообщение..." required maxlength="500">
+                <button type="submit" class="btn btn-primary">Отправить</button>
+                <button type="button" class="btn btn-secondary" onclick="loadMessages()">Обновить</button>
+            </form>
+        </div>
+
+        <!-- ============================================================
+             РАЗДЕЛ "ОБЩЕНИЕ" — личный мессенджер
+             ============================================================ -->
+        <div id="messenger" class="page">
+            <h1>💬 Общение</h1>
+            <div class="messenger-layout">
+                <!-- Левая колонка: список чатов + поиск пользователей -->
+                <div class="messenger-sidebar">
+                    <div class="messenger-actions">
+                        <button class="btn btn-primary" onclick="openUserSearchModal()">🔍 Найти пользователя</button>
+                        <button class="btn btn-secondary" onclick="openCreateGroupModal()">👥 Создать группу</button>
+                    </div>
+                    <div id="messenger-chat-list" class="messenger-chat-list"></div>
+                </div>
+
+                <!-- Правая колонка: открытая переписка -->
+                <div class="messenger-conversation">
+                    <div id="messenger-empty-state" class="messenger-empty-state">
+                        <p>Выберите чат слева или найдите пользователя, чтобы начать переписку.</p>
+                    </div>
+
+                    <div id="messenger-active-chat" class="messenger-active-chat" style="display:none;">
+                        <div class="messenger-chat-header">
+                            <div>
+                                <div id="messenger-chat-title" class="messenger-chat-title">—</div>
+                                <div id="messenger-chat-subtitle" class="messenger-chat-subtitle"></div>
+                            </div>
+                            <div class="messenger-chat-menu-wrapper">
+                                <button class="btn-icon" onclick="toggleChatMenu()" title="Управление чатом">⋮</button>
+                                <div id="messenger-chat-menu" class="messenger-chat-menu" style="display:none;">
+                                    <button onclick="handleBlockToggle()" id="messenger-block-btn">✅ Заблокировать пользователя</button>
+                                    <button onclick="handlePinToggle()" id="messenger-pin-btn">📌 Закрепить чат</button>
+                                    <button onclick="handleMuteToggle()" id="messenger-mute-btn">🔕 Отключить уведомления</button>
+                                    <button onclick="handleRenameGroup()" id="messenger-rename-btn" style="display:none;">✏️ Переименовать группу</button>
+                                    <button onclick="handleDeleteChat()" class="danger-option">🗑️ Удалить чат</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="messenger-messages" class="chat-box messenger-messages"></div>
+
+                        <form id="messenger-form" class="chat-form" onsubmit="sendMessengerMessage(event)">
+                            <input type="text" id="messenger-input" placeholder="Напишите сообщение..." required maxlength="1000">
+                            <button type="submit" class="btn btn-primary">Отправить</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Модальное окно поиска пользователей -->
+        <div id="user-search-modal" class="modal-overlay" style="display:none;">
+            <div class="modal-box">
+                <div class="modal-header">
+                    <h2>Найти пользователя</h2>
+                    <button class="btn-icon" onclick="closeUserSearchModal()">✕</button>
+                </div>
+                <input type="text" id="user-search-input" placeholder="Введите никнейм..." oninput="handleUserSearchInput(this.value)">
+                <div id="user-search-results" class="user-search-results"></div>
+            </div>
+        </div>
+
+        <!-- Модальное окно создания группового чата -->
+        <div id="create-group-modal" class="modal-overlay" style="display:none;">
+            <div class="modal-box">
+                <div class="modal-header">
+                    <h2>Создать группу</h2>
+                    <button class="btn-icon" onclick="closeCreateGroupModal()">✕</button>
+                </div>
+                <div class="form-group">
+                    <label>Название группы</label>
+                    <input type="text" id="group-name-input" placeholder="Например: Клуб цветоводов">
+                </div>
+                <div class="form-group">
+                    <label>Участники (выберите одного или нескольких)</label>
+                    <input type="text" id="group-members-search" placeholder="Поиск по никнейму..." oninput="handleGroupMemberSearch(this.value)">
+                    <div id="group-members-results" class="user-search-results"></div>
+                    <div id="group-members-selected" class="group-members-selected"></div>
+                </div>
+                <button class="btn btn-primary" onclick="submitCreateGroup()">Создать группу</button>
+            </div>
+        </div>
+
+        <!-- Модальное окно подтверждения удаления чата -->
+        <div id="confirm-delete-chat-modal" class="modal-overlay" style="display:none;">
+            <div class="modal-box modal-box-small">
+                <h2>Удалить чат?</h2>
+                <p>Переписка исчезнет из вашего списка чатов. Собеседник по-прежнему будет видеть историю у себя.</p>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" onclick="closeConfirmDeleteChatModal()">Отмена</button>
+                    <button class="btn btn-danger" onclick="confirmDeleteChat()">Удалить</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+             РАЗДЕЛ "ОБМЕН" — предложения обмена растениями
+             ============================================================ -->
+        <div id="trade" class="page">
+            <h1>🔄 Обмен растениями</h1>
+            <div class="trade-tabs">
+                <button class="filter-btn active" data-trade-tab="all" onclick="setTradeTab('all')">Все предложения</button>
+                <button class="filter-btn" data-trade-tab="mine" onclick="setTradeTab('mine')">Мои предложения</button>
+                <button class="filter-btn" data-trade-tab="incoming" onclick="setTradeTab('incoming')">Адресованные мне</button>
+            </div>
+            <div id="trade-offers-list" class="trade-offers-list"></div>
+        </div>
+
+        <!-- Модальное окно "Предложить обмен" (открывается с карточки растения из своей коллекции) -->
+        <div id="trade-offer-modal" class="modal-overlay" style="display:none;">
+            <div class="modal-box">
+                <div class="modal-header">
+                    <h2>Предложить обмен</h2>
+                    <button class="btn-icon" onclick="closeTradeOfferModal()">✕</button>
+                </div>
+                <div class="form-group">
+                    <label>Какое растение предлагаете</label>
+                    <select id="trade-offer-plant-select"></select>
+                </div>
+                <div class="form-group">
+                    <label>Кому адресовано (необязательно)</label>
+                    <input type="text" id="trade-offer-target" placeholder="Никнейм или оставьте пустым для всех">
+                </div>
+                <div class="form-group">
+                    <label>Комментарий</label>
+                    <textarea id="trade-offer-comment" rows="3" placeholder="Например: меняю на суккулент"></textarea>
+                </div>
+                <button class="btn btn-primary" onclick="submitTradeOffer()">Отправить предложение</button>
+            </div>
+        </div>
+
+        <!-- ============================================================
+             РАЗДЕЛ "РАСПОЗНАТЬ" — определение растения по фотографии
+             ============================================================ -->
+        <div id="recognize" class="page">
+            <h1>📷 Распознать растение по фото</h1>
+            <p class="page-subtitle">Загрузите фотографию растения — сервис Plant.id попробует определить его вид.</p>
+
+            <div id="recognize-dropzone" class="recognize-dropzone">
+                <input type="file" id="recognize-file-input" accept="image/*" style="display:none;">
+                <div id="recognize-dropzone-content">
+                    <div class="recognize-dropzone-icon">📷</div>
+                    <p><strong>Перетащите фото сюда</strong> или нажмите, чтобы выбрать файл</p>
+                    <p class="page-subtitle">JPG, PNG — до 10 МБ</p>
+                </div>
+            </div>
+
+            <div id="recognize-loading" class="recognize-loading" style="display:none;">
+                <div class="spinner"></div>
+                <p>Распознаём растение...</p>
+            </div>
+
+            <div id="recognize-result" class="recognize-result" style="display:none;"></div>
+
+            <div id="recognize-history-section">
+                <h2 class="section-subheading">История распознаваний</h2>
+                <div id="recognize-history-list" class="recognize-history-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification-toast"></div>
+    <audio id="messenger-notification-sound" preload="auto"></audio>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,9 @@
+
+1. переименуй `database.example.json` на `database.json`.
+2. Установи библиотеки (в терминале папки проекта):
+   npm install
+3. Запусти сервер в терминале:
+   node server.js
+4. Открой в браузере:
+   http://localhost:3000
+
